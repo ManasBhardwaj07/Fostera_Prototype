@@ -11,8 +11,6 @@ export const AppDetailModal = () => {
     limits,
     totalUsageMinutes,
     setActiveTab,
-    setIsSchedulesModalOpen,
-    setIsReductionModalOpen,
   } = useApp();
 
   if (!selectedAppForDetail) return null;
@@ -22,97 +20,56 @@ export const AppDetailModal = () => {
   const evalLimit = evaluateAppLimit(app.usageMinutes, limit);
   const share = totalUsageMinutes > 0 ? Math.round((app.usageMinutes / totalUsageMinutes) * 100) : 0;
 
-  const handleStartFocus = () => {
-    setSelectedAppForDetail(null);
-    setActiveTab('FOCUS');
-  };
-
-  const handleSetLimit = () => {
-    setSelectedAppForDetail(null);
-    setSelectedAppForLimit(app);
-  };
-
-  const handleOpenSchedule = () => {
-    setSelectedAppForDetail(null);
-    setIsSchedulesModalOpen(true);
-  };
-
-  const handleOpenReduction = () => {
-    setSelectedAppForDetail(null);
-    setIsReductionModalOpen(true);
-  };
-
   return (
     <Modal
       isOpen={true}
       onClose={() => setSelectedAppForDetail(null)}
-      title={app.appName}
-      subtitle={app.category}
+      position="bottom"
     >
-      <div className="space-y-4">
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Today's Usage</span>
-            <div className="text-xl font-bold text-slate-900">{formatMinutes(app.usageMinutes)}</div>
-            <div className="text-xs text-slate-500">{share}% of daily total</div>
+      <div className="space-y-6">
+        
+        {/* Header directly in body since title is omitted from Modal wrapper to use custom layout */}
+        <div className="text-center space-y-1">
+          <div className="w-16 h-16 rounded-3xl bg-fostera-surface-soft border border-black/5 mx-auto flex items-center justify-center text-2xl font-bold text-fostera-text-primary mb-3">
+             {app.appName.slice(0,1)}
           </div>
-
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Daily Limit</span>
-            <div className="text-xl font-bold text-slate-900">
-              {limit && limit.enabled ? formatMinutes(limit.limitMinutes) : 'None'}
-            </div>
-            <div className="text-xs text-slate-500">
-              <StatusBadge status={evalLimit.status} text={evalLimit.statusText} />
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold text-fostera-text-primary">{app.appName}</h2>
+          <p className="text-sm text-fostera-text-secondary">{app.category}</p>
         </div>
 
-        {/* Status Notice */}
-        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex items-center justify-between">
-          <span className="text-slate-600 font-medium">Current Status:</span>
-          <StatusBadge status={evalLimit.status} text={evalLimit.statusText} />
+        {/* Stats */}
+        <div className="bg-fostera-warm rounded-[20px] p-4 flex justify-between items-center">
+           <div>
+             <div className="text-[11px] uppercase tracking-wider font-bold text-fostera-text-secondary mb-1">Today's Usage</div>
+             <div className="text-xl font-bold text-fostera-text-primary">{formatMinutes(app.usageMinutes)}</div>
+             <div className="text-xs text-fostera-text-secondary mt-0.5">{share}% of total</div>
+           </div>
+           <div className="text-right">
+             <div className="text-[11px] uppercase tracking-wider font-bold text-fostera-text-secondary mb-1">Daily Limit</div>
+             <div className="text-xl font-bold text-fostera-text-primary">{limit?.enabled ? formatMinutes(limit.limitMinutes) : 'None'}</div>
+             <StatusBadge status={evalLimit.status} text={evalLimit.statusText} className="mt-0.5" />
+           </div>
         </div>
 
         {/* Actions */}
-        <div className="space-y-2 pt-1">
-          <Button
-            variant="primary"
-            size="md"
-            onClick={handleSetLimit}
-            className="w-full"
-          >
-            {limit && limit.enabled ? 'Adjust Daily Limit' : 'Set Daily Limit'}
-          </Button>
-
+        <div className="space-y-3 pt-2">
           <Button
             variant="secondary"
-            size="md"
-            onClick={handleStartFocus}
+            size="lg"
+            onClick={() => { setSelectedAppForDetail(null); setSelectedAppForLimit(app); }}
             className="w-full"
           >
-            Start Focus Session
+            {limit?.enabled ? 'Adjust Limit' : 'Set Limit'}
           </Button>
 
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <Button
-              variant="subtle"
-              size="sm"
-              onClick={handleOpenSchedule}
-              className="border border-slate-200 bg-white"
-            >
-              Add to Schedule
-            </Button>
-            <Button
-              variant="subtle"
-              size="sm"
-              onClick={handleOpenReduction}
-              className="border border-slate-200 bg-white"
-            >
-              Gradual Detox
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => { setSelectedAppForDetail(null); setActiveTab('FOCUS'); }}
+            className="w-full"
+          >
+            Focus Instead
+          </Button>
         </div>
       </div>
     </Modal>

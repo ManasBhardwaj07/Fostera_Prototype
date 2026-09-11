@@ -32,7 +32,7 @@ export const SchedulesModal = () => {
       onClose={() => setIsSchedulesModalOpen(false)}
       title="Scheduled Blocking"
       subtitle="Automated routines for deep work, study, or sleep."
-      maxWidth="max-w-lg"
+      
     >
       <div className="space-y-3">
         {/* Rules List (Section 24) */}

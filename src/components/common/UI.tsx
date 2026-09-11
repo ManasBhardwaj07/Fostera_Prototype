@@ -14,7 +14,7 @@ export const Card = ({
   return (
     <div
       onClick={onClick}
-      className={`bg-fostera-surface rounded-[20px] p-5 shadow-sm border border-black/[0.03] ${
+      className={`bg-fostera-surface rounded-[24px] p-5 shadow-sm border border-black/[0.03] ${
         onClick ? 'cursor-pointer active:scale-[0.98] transition-transform' : ''
       } ${className}`}
     >
@@ -44,16 +44,16 @@ export const Button = ({
   const base = 'inline-flex items-center justify-center font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
   
   const sizeStyles = {
-    sm: 'text-xs px-3 py-1.5 rounded-xl gap-1.5',
-    md: 'text-sm px-4 py-3 rounded-xl gap-2',
-    lg: 'text-base px-5 py-4 rounded-2xl gap-2 font-semibold',
+    sm: 'text-xs px-4 py-2 rounded-xl gap-1.5',
+    md: 'text-sm px-5 py-3.5 rounded-2xl gap-2',
+    lg: 'text-base px-6 py-4 rounded-[20px] gap-2 font-semibold',
   };
 
   const variantStyles = {
-    primary: 'bg-fostera-brand text-white focus:ring-fostera-brand/30',
-    focal: 'bg-fostera-focal text-white focus:ring-fostera-focal/30',
-    secondary: 'bg-fostera-surface text-fostera-text-primary border border-black/5 focus:ring-black/10',
-    danger: 'bg-rose-50 text-rose-700 border border-rose-100 focus:ring-rose-200',
+    primary: 'bg-fostera-brand text-white focus:ring-fostera-brand/30 hover:bg-fostera-brand-dark',
+    focal: 'bg-fostera-focal text-white focus:ring-fostera-focal/30 hover:bg-[#0f1713]',
+    secondary: 'bg-white text-fostera-text-primary border border-black/10 focus:ring-black/10 hover:bg-black/5',
+    danger: 'bg-rose-50 text-rose-700 border border-rose-100 focus:ring-rose-200 hover:bg-rose-100',
     subtle: 'text-fostera-text-secondary hover:text-fostera-text-primary hover:bg-black/5 focus:ring-black/10',
   };
 
@@ -80,7 +80,7 @@ export const StatusBadge = ({
   className?: string;
 }) => {
   const styles = {
-    UNDER: 'bg-[#E4F0E9] text-[#216044] font-medium', // using brand-soft/brand-dark
+    UNDER: 'bg-fostera-brand-soft text-fostera-brand-dark font-medium',
     AT_LIMIT: 'bg-amber-100 text-amber-800 font-medium',
     EXCEEDED: 'bg-rose-100 text-rose-700 font-semibold',
     NO_LIMIT: 'bg-black/5 text-fostera-text-secondary font-normal',
@@ -104,52 +104,65 @@ export const PageHeader = ({
   action?: ReactNode;
 }) => {
   return (
-    <div className="flex items-start justify-between pb-2 mb-4">
+    <div className="flex items-start justify-between pb-2 mb-4 px-2">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fostera-text-primary">{title}</h1>
-        {subtitle && <p className="text-sm text-fostera-text-secondary mt-1">{subtitle}</p>}
+        <h1 className="text-3xl font-bold tracking-tight text-fostera-text-primary">{title}</h1>
+        {subtitle && <p className="text-[13px] text-fostera-text-secondary mt-1">{subtitle}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>
   );
 };
 
-// Shared Modal Container
+// Shared Modal Container (Supports Center Dialog & Bottom Sheet)
 export const Modal = ({
   isOpen,
   onClose,
   title,
   subtitle,
   children,
-  
+  position = 'center',
 }: {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   subtitle?: string;
   children: ReactNode;
-  maxWidth?: string;
+  position?: 'center' | 'bottom';
 }) => {
   if (!isOpen) return null;
 
+  const positionClasses = position === 'bottom'
+    ? "items-end sm:items-center" // Bottom sheet on mobile, center on desktop (if responsive classes kept)
+    : "items-center";
+
+  const containerClasses = position === 'bottom'
+    ? "w-full rounded-t-[32px] sm:rounded-[32px] mt-10 max-h-[90vh]"
+    : "w-[90%] max-w-[400px] rounded-[32px] max-h-[85vh]";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-fostera-focal/40 backdrop-blur-sm animate-fade-in">
+    <div className={`fixed inset-0 z-50 flex justify-center p-0 sm:p-4 bg-fostera-focal/40 backdrop-blur-sm animate-fade-in ${positionClasses}`}>
       <div
-        className={`w-full max-w-[400px] bg-fostera-surface rounded-[24px] shadow-xl overflow-hidden flex flex-col max-h-[85vh]`}
+        className={`bg-fostera-surface shadow-2xl overflow-hidden flex flex-col ${containerClasses}`}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-black/[0.03]">
-          <div>
-            <h3 className="text-lg font-bold text-fostera-text-primary">{title}</h3>
-            {subtitle && <p className="text-sm text-fostera-text-secondary mt-0.5">{subtitle}</p>}
+        {(title || subtitle) && (
+          <div className="flex items-center justify-between px-6 pt-6 pb-4">
+            <div>
+              {title && <h3 className="text-xl font-bold tracking-tight text-fostera-text-primary">{title}</h3>}
+              {subtitle && <p className="text-sm text-fostera-text-secondary mt-1">{subtitle}</p>}
+            </div>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-black/5 text-fostera-text-secondary hover:text-fostera-text-primary hover:bg-black/10 flex items-center justify-center transition-colors"
+            >
+              <CloseIcon className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full text-fostera-text-secondary hover:text-fostera-text-primary hover:bg-black/5 flex items-center justify-center transition-colors"
-          >
-            <CloseIcon className="w-5 h-5" />
-          </button>
+        )}
+        <div className={`${(title || subtitle) ? 'px-6 pb-8' : 'p-6'} overflow-y-auto`}>
+          {children}
         </div>
-        <div className="p-6 overflow-y-auto space-y-5">{children}</div>
       </div>
     </div>
   );
