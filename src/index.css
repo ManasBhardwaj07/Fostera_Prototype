@@ -4,6 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    /* Using a neutral dark/blurred desktop background so the phone frame stands out */
+    @apply bg-slate-200 text-fostera-text-primary antialiased;
   }
 }
