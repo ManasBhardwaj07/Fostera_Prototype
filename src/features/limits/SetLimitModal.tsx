@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { formatMinutes } from '../../utils/format';
+import { Modal, Button } from '../../components/common/UI';
 
 export const SetLimitModal = () => {
   const { selectedAppForLimit, setSelectedAppForLimit, limits, setAppLimit, removeAppLimit } = useApp();
@@ -32,32 +33,19 @@ export const SetLimitModal = () => {
     setSelectedAppForLimit(null);
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-4 animate-fade-in">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-t-3xl md:rounded-3xl p-6 space-y-6 shadow-2xl animate-slide-up">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold"
-              style={{ backgroundColor: `${app.color}25`, color: app.color }}
-            >
-              {app.icon}
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Set Limit for {app.appName}</h2>
-              <span className="text-xs text-slate-400">Current today's usage: {formatMinutes(app.usageMinutes)}</span>
-            </div>
-          </div>
-          <button
-            onClick={() => setSelectedAppForLimit(null)}
-            className="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
-          >
-            ✕
-          </button>
-        </div>
+  const activeAllowance = isCustom ? parseInt(customInput, 10) || 60 : selectedMinutes;
 
-        <div className="space-y-2.5">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Daily Allowance</span>
+  return (
+    <Modal
+      isOpen={true}
+      onClose={() => setSelectedAppForLimit(null)}
+      title={`Daily Limit: ${app.appName}`}
+      subtitle={`Current usage today: ${formatMinutes(app.usageMinutes)}`}
+    >
+      <div className="space-y-4">
+        {/* Preset Buttons */}
+        <div className="space-y-2">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Allowance</span>
           <div className="grid grid-cols-3 gap-2">
             {presets.map(p => {
               const isSelected = !isCustom && selectedMinutes === p.minutes;
@@ -68,10 +56,10 @@ export const SetLimitModal = () => {
                     setSelectedMinutes(p.minutes);
                     setIsCustom(false);
                   }}
-                  className={`py-3 px-2 rounded-xl text-center font-semibold text-xs border transition-all ${
+                  className={`py-2.5 px-3 rounded-lg text-center font-semibold text-xs border transition-all ${
                     isSelected
-                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
-                      : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-800'
+                      ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
+                      : 'bg-white border-slate-200 text-slate-800 hover:border-slate-300'
                   }`}
                 >
                   {p.label}
@@ -82,56 +70,60 @@ export const SetLimitModal = () => {
 
           <button
             onClick={() => setIsCustom(true)}
-            className={`w-full py-2.5 px-4 rounded-xl text-left text-xs font-medium border transition-all flex items-center justify-between ${
+            className={`w-full py-2 px-3 rounded-lg text-left text-xs font-medium border transition-all flex items-center justify-between ${
               isCustom
-                ? 'bg-indigo-600/20 border-indigo-500 text-indigo-200'
-                : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-800'
+                ? 'bg-slate-900 border-slate-900 text-white'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
             }`}
           >
             <span>Custom Allowance</span>
-            <span className="font-mono">{isCustom ? `${customInput} mins` : 'Custom'}</span>
+            <span>{isCustom ? `${customInput} mins` : 'Custom'}</span>
           </button>
 
           {isCustom && (
-            <div className="pt-2">
+            <div className="pt-1">
               <input
                 type="number"
                 value={customInput}
                 onChange={e => setCustomInput(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#2F855A]"
                 placeholder="Minutes (e.g. 45)"
               />
             </div>
           )}
         </div>
 
-        <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/60 text-xs text-slate-300">
-          💡 If you set <span className="font-bold text-white">{formatMinutes(isCustom ? (parseInt(customInput, 10) || 60) : selectedMinutes)}</span>,
-          with current usage of <span className="font-bold text-white">{formatMinutes(app.usageMinutes)}</span>,
-          the status will immediately become{' '}
-          <span className="font-bold text-rose-400">
-            {app.usageMinutes > (isCustom ? (parseInt(customInput, 10) || 60) : selectedMinutes) ? 'EXCEEDED' : 'UNDER LIMIT'}
-          </span>.
+        {/* Consequence Preview */}
+        <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
+          💡 If you set <strong>{formatMinutes(activeAllowance)}</strong>, with <strong>{formatMinutes(app.usageMinutes)}</strong> used, status will immediately evaluate to{' '}
+          <strong className={app.usageMinutes > activeAllowance ? 'text-rose-600' : 'text-emerald-700'}>
+            {app.usageMinutes > activeAllowance ? 'EXCEEDED' : 'UNDER LIMIT'}
+          </strong>.
         </div>
 
-        <div className="space-y-2 pt-2">
-          <button
+        {/* Buttons */}
+        <div className="space-y-2 pt-1">
+          <Button
+            variant="primary"
+            size="md"
             onClick={handleSave}
-            className="w-full py-3.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/25 transition-all"
+            className="w-full"
           >
             Save Limit
-          </button>
+          </Button>
 
           {currentLimit && (
-            <button
+            <Button
+              variant="danger"
+              size="sm"
               onClick={handleRemove}
-              className="w-full py-2.5 text-center text-xs text-rose-400 hover:text-rose-300 transition-colors"
+              className="w-full"
             >
               Remove Limit
-            </button>
+            </Button>
           )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };

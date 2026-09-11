@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { Modal, Button } from '../../components/common/UI';
 
 export const SchedulesModal = () => {
   const { isSchedulesModalOpen, setIsSchedulesModalOpen, scheduleRules, toggleScheduleRule, addScheduleRule, apps } = useApp();
@@ -26,116 +27,104 @@ export const SchedulesModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-4 animate-fade-in">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-t-3xl md:rounded-3xl p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-white">Scheduled Blocking</h2>
-            <p className="text-xs text-slate-400">Automatic routines for study, work, or sleep</p>
-          </div>
-          <button
-            onClick={() => setIsSchedulesModalOpen(false)}
-            className="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+    <Modal
+      isOpen={isSchedulesModalOpen}
+      onClose={() => setIsSchedulesModalOpen(false)}
+      title="Scheduled Blocking"
+      subtitle="Automated routines for deep work, study, or sleep."
+      maxWidth="max-w-lg"
+    >
+      <div className="space-y-3">
+        {/* Rules List (Section 24) */}
+        {scheduleRules.map(rule => (
+          <div
+            key={rule.id}
+            className={`p-3.5 rounded-xl border transition-all flex items-center justify-between ${
+              rule.enabled ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200 opacity-60'
+            }`}
           >
-            ✕
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {scheduleRules.map(rule => (
-            <div
-              key={rule.id}
-              className={`p-4 rounded-2xl border transition-all ${
-                rule.enabled
-                  ? 'bg-slate-800/80 border-slate-700/80'
-                  : 'bg-slate-900/50 border-slate-800/60 opacity-60'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-slate-100 text-sm">{rule.name}</h3>
-                  <div className="text-xs text-indigo-400 font-medium mt-0.5">
-                    {rule.startTime} – {rule.endTime} • {rule.days.join(', ')}
-                  </div>
-                </div>
-                <button
-                  onClick={() => toggleScheduleRule(rule.id)}
-                  className={`w-12 h-6 rounded-full transition-colors p-1 flex items-center ${
-                    rule.enabled ? 'bg-indigo-600 justify-end' : 'bg-slate-700 justify-start'
-                  }`}
-                >
-                  <div className="w-4 h-4 rounded-full bg-white shadow-md" />
-                </button>
+            <div>
+              <div className="font-bold text-xs text-slate-900">{rule.name}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                {rule.startTime} – {rule.endTime} • {rule.days.join(', ')}
               </div>
-
-              <div className="mt-3 pt-2.5 border-t border-slate-700/50 flex flex-wrap gap-1.5">
+              <div className="flex gap-1.5 mt-2">
                 {rule.restrictedAppIds.map(appId => {
                   const app = apps.find(a => a.appId === appId);
                   return (
-                    <span key={appId} className="px-2 py-0.5 bg-slate-900 rounded-md text-[10px] text-slate-300">
+                    <span key={appId} className="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] text-slate-700">
                       {app?.appName || appId}
                     </span>
                   );
                 })}
               </div>
             </div>
-          ))}
-        </div>
+
+            <button
+              onClick={() => toggleScheduleRule(rule.id)}
+              className={`w-11 h-6 rounded-full p-0.5 transition-colors ${
+                rule.enabled ? 'bg-[#2F855A]' : 'bg-slate-300'
+              }`}
+            >
+              <div
+                className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${
+                  rule.enabled ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+        ))}
 
         {!isCreating ? (
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => setIsCreating(true)}
-            className="w-full py-3 px-4 rounded-xl border border-dashed border-slate-700 hover:border-slate-500 text-slate-300 text-xs font-semibold transition-all"
+            className="w-full border-dashed"
           >
             + Create New Schedule Rule
-          </button>
+          </Button>
         ) : (
-          <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700 space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">New Routine</h4>
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+            <div className="font-bold text-slate-900">New Schedule Rule</div>
             <input
               type="text"
               placeholder="e.g. Deep Work Morning"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#2F855A]"
             />
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] text-slate-400">Start Time</label>
+                <label className="text-[10px] text-slate-500 block mb-1">Start Time</label>
                 <input
                   type="time"
                   value={startTime}
                   onChange={e => setStartTime(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs text-slate-900"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-400">End Time</label>
+                <label className="text-[10px] text-slate-500 block mb-1">End Time</label>
                 <input
                   type="time"
                   value={endTime}
                   onChange={e => setEndTime(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs text-slate-900"
                 />
               </div>
             </div>
-            <div className="flex space-x-2 pt-2">
-              <button
-                onClick={handleCreate}
-                className="flex-1 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold"
-              >
-                Save Schedule
-              </button>
-              <button
-                onClick={() => setIsCreating(false)}
-                className="py-2 px-3 text-xs text-slate-400 hover:text-white"
-              >
+            <div className="flex space-x-2 pt-1">
+              <Button variant="primary" size="sm" onClick={handleCreate} className="flex-1">
+                Save Rule
+              </Button>
+              <Button variant="subtle" size="sm" onClick={() => setIsCreating(false)}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };

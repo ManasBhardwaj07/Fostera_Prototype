@@ -1,10 +1,9 @@
-import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { OnboardingFlow } from './features/onboarding/OnboardingFlow';
 import { Dashboard } from './features/dashboard/Dashboard';
 import { FocusView } from './features/focus/FocusView';
 import { ProgressView } from './features/progress/ProgressView';
-import { Navigation } from './components/Navigation';
+import { DesktopSidebar, MobileNavigation } from './components/Navigation';
 
 // Modals
 import { AppDetailModal } from './features/apps/AppDetailModal';
@@ -15,36 +14,38 @@ import { ReductionModal } from './features/reduction/ReductionModal';
 import { InsightsModal } from './features/insights/InsightsModal';
 import { DevControlsModal } from './features/dev/DevControlsModal';
 
-const AppContent: React.FC = () => {
+const AppContent = () => {
   const { profile, activeTab } = useApp();
 
-  // If onboarding is not completed, show onboarding flow
   if (!profile.onboardingComplete) {
     return <OnboardingFlow />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start text-slate-100">
-      {/* Mobile Shell Container */}
-      <div className="w-full max-w-md min-h-screen bg-slate-950 shadow-2xl relative flex flex-col justify-between">
-        <main className="flex-1">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col md:flex-row antialiased">
+      {/* Desktop Left Sidebar */}
+      <DesktopSidebar />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-8">
           {activeTab === 'TODAY' && <Dashboard />}
           {activeTab === 'FOCUS' && <FocusView />}
           {activeTab === 'PROGRESS' && <ProgressView />}
         </main>
 
-        {/* Global Navigation Bar */}
-        <Navigation />
-
-        {/* Global Modals & Overlays */}
-        <AppDetailModal />
-        <SetLimitModal />
-        <FocusCompletionModal />
-        <SchedulesModal />
-        <ReductionModal />
-        <InsightsModal />
-        <DevControlsModal />
+        {/* Mobile Persistent Bottom Navigation */}
+        <MobileNavigation />
       </div>
+
+      {/* Global Modals */}
+      <AppDetailModal />
+      <SetLimitModal />
+      <FocusCompletionModal />
+      <SchedulesModal />
+      <ReductionModal />
+      <InsightsModal />
+      <DevControlsModal />
     </div>
   );
 };

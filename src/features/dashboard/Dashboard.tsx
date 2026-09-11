@@ -3,6 +3,8 @@ import { formatMinutes } from '../../utils/format';
 import { getZoneMeta } from '../../domain/usage/zoneCalculator';
 import { evaluateAppLimit } from '../../domain/limits/limitEvaluator';
 import { WeeklyTrendChart } from './WeeklyTrendChart';
+import { Card, Button, StatusBadge } from '../../components/common/UI';
+import { SettingsIcon, ChevronRightIcon } from '../../components/common/Icons';
 
 export const Dashboard = () => {
   const {
@@ -28,69 +30,80 @@ export const Dashboard = () => {
 
   const zoneMeta = getZoneMeta(currentZone);
 
-  const keyInsight = {
-    title: 'Dominance Pattern',
-    description: "YouTube + Instagram account for 63% of today's usage.",
-  };
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-28 pt-4 px-4 max-w-md mx-auto space-y-4">
-      <header className="flex items-center justify-between pt-2 pb-1">
+    <div className="space-y-5 pb-16 md:pb-6">
+      {/* Mobile Top Header */}
+      <header className="flex md:hidden items-center justify-between pb-1">
         <div>
-          <span className="text-xs font-medium text-slate-400 tracking-wide uppercase">Digital Well-Being</span>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
-            <span>Good evening, {profile.userName}</span>
-          </h1>
+          <span className="text-[11px] font-bold text-[#2F855A] uppercase tracking-wider">Digital Well-Being</span>
+          <h1 className="text-xl font-bold text-slate-900">Good evening, {profile.userName}</h1>
         </div>
         <button
           onClick={() => setIsDevModalOpen(true)}
-          className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 flex items-center justify-center text-sm transition-colors"
-          title="Fostera Settings & Demo Controls"
+          className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors shadow-xs"
+          title="Settings"
         >
-          ⚙️
+          <SettingsIcon className="w-4 h-4" />
         </button>
       </header>
 
+      {/* Desktop Header Greeting */}
+      <div className="hidden md:flex items-center justify-between pb-1">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Good evening, {profile.userName}
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">Here is your digital well-being overview for today.</p>
+        </div>
+      </div>
+
+      {/* Compact Active Focus Mode Banner (Section 21) */}
       {activeFocus && activeFocus.status === 'active' && (
-        <div className="bg-gradient-to-r from-indigo-950/90 to-purple-950/90 border border-indigo-500/40 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 flex items-center justify-between animate-pulse">
+        <div className="bg-[#0F172A] text-white rounded-xl p-3.5 sm:p-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center space-x-3">
-            <span className="text-2xl">🎯</span>
+            <span className="flex h-2.5 w-2.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-indigo-400">Focus Mode Active</div>
-              <div className="text-sm font-semibold text-white">
-                {Math.floor(activeFocus.remainingSeconds / 60)}m {activeFocus.remainingSeconds % 60}s remaining
+              <div className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                Focus Mode Active
               </div>
-              <div className="text-[11px] text-slate-300">
+              <div className="text-sm text-slate-200">
+                {Math.floor(activeFocus.remainingSeconds / 60)}m {activeFocus.remainingSeconds % 60}s remaining •{' '}
                 {activeFocus.selectedAppIds.length} apps restricted
               </div>
             </div>
           </div>
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => setActiveTab('FOCUS')}
-            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium transition-colors"
           >
-            View Session
-          </button>
+            View Session →
+          </Button>
         </div>
       )}
 
+      {/* Contextual Nudge Banner (Section 27) */}
       {nudges.length > 0 && (
         <div className="space-y-2">
           {nudges.slice(0, 1).map(nudge => (
             <div
               key={nudge.id}
-              className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 flex items-start justify-between space-x-3"
+              className="bg-amber-50/90 border border-amber-200/90 rounded-xl p-3 sm:p-3.5 flex items-start justify-between text-xs"
             >
               <div className="flex items-start space-x-2.5">
-                <span className="text-lg mt-0.5">⚠️</span>
+                <span className="text-amber-700 font-bold mt-0.5">ℹ️</span>
                 <div>
-                  <p className="text-xs font-medium text-amber-200 leading-snug">{nudge.message}</p>
+                  <div className="font-semibold text-amber-900">Fostera Notice</div>
+                  <p className="text-amber-800 mt-0.5">{nudge.message}</p>
                   {nudge.actionable && (
                     <div className="flex items-center space-x-2 mt-2">
                       {nudge.actionType === 'focus' && (
                         <button
                           onClick={() => setActiveTab('FOCUS')}
-                          className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-amber-950 rounded-lg text-[11px] font-semibold transition-colors"
+                          className="px-2.5 py-1 bg-[#2F855A] text-white rounded-md font-medium text-xs hover:bg-[#276749] transition-colors"
                         >
                           Start Focus
                         </button>
@@ -101,14 +114,14 @@ export const Dashboard = () => {
                             const yt = apps.find(a => a.appId === 'youtube');
                             if (yt) setSelectedAppForLimit(yt);
                           }}
-                          className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-amber-950 rounded-lg text-[11px] font-semibold transition-colors"
+                          className="px-2.5 py-1 bg-white border border-amber-300 text-amber-900 rounded-md font-medium text-xs hover:bg-amber-100 transition-colors"
                         >
                           Review Limit
                         </button>
                       )}
                       <button
                         onClick={() => dismissNudge(nudge.id)}
-                        className="text-[11px] text-amber-300/70 hover:text-amber-200"
+                        className="text-amber-700 hover:text-amber-900 text-xs underline pl-1"
                       >
                         Dismiss
                       </button>
@@ -118,7 +131,7 @@ export const Dashboard = () => {
               </div>
               <button
                 onClick={() => dismissNudge(nudge.id)}
-                className="text-amber-400/60 hover:text-amber-400 text-xs"
+                className="text-amber-500 hover:text-amber-800 text-xs p-1"
               >
                 ✕
               </button>
@@ -127,177 +140,200 @@ export const Dashboard = () => {
         </div>
       )}
 
-      <div className="bg-slate-900/90 rounded-3xl p-5 border border-slate-800/80 shadow-xl space-y-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Today's Screen Time</span>
-            <div className="text-4xl font-extrabold tracking-tight text-white mt-1">
-              {formatMinutes(totalUsageMinutes)}
-            </div>
-          </div>
-
-          <div className={`px-3 py-1.5 rounded-xl border flex flex-col items-end ${zoneMeta.bgClass} ${zoneMeta.borderClass}`}>
-            <div className="flex items-center space-x-1.5">
-              <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: zoneMeta.hexColor }} />
-              <span className={`text-xs font-bold uppercase tracking-wider ${zoneMeta.textClass}`}>
-                {zoneMeta.name}
-              </span>
-            </div>
-            <span className="text-[10px] text-slate-400 mt-0.5">{zoneMeta.rangeText}</span>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-1.5 text-slate-400">
-            <span>Daily Target:</span>
-            <span className="font-semibold text-slate-200">{formatMinutes(profile.dailyGoalMinutes)}</span>
-          </div>
-
-          <div
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center space-x-1 ${
-              isOverGoal
-                ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-                : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-            }`}
-          >
-            <span>{isOverGoal ? '⚠️' : '✓'}</span>
-            <span>
-              {formatMinutes(goalDiffMinutes)} {isOverGoal ? 'over goal' : 'remaining'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-indigo-950/40 border border-indigo-500/30 rounded-2xl p-4 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-base">💡</span>
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">Key Insight</span>
-          </div>
-          <button
-            onClick={() => setIsInsightsModalOpen(true)}
-            className="text-[11px] font-medium text-indigo-400 hover:text-indigo-300"
-          >
-            View all →
-          </button>
-        </div>
-
-        <p className="text-xs text-slate-300 leading-relaxed font-medium">
-          {keyInsight.description}
-        </p>
-
-        <div className="pt-1 flex items-center space-x-2">
-          <button
-            onClick={() => setActiveTab('FOCUS')}
-            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all"
-          >
-            Start Focus
-          </button>
-          <button
-            onClick={() => {
-              const yt = apps.find(a => a.appId === 'youtube');
-              if (yt) setSelectedAppForLimit(yt);
-            }}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-all"
-          >
-            Set YouTube Limit
-          </button>
-        </div>
-      </div>
-
-      <WeeklyTrendChart trend={weeklyTrend} goalMinutes={profile.dailyGoalMinutes} />
-
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Top Consuming Apps</h2>
-          <span className="text-[11px] text-slate-500">Tap app to inspect & set limits</span>
-        </div>
-
-        <div className="space-y-2">
-          {apps.map(app => {
-            const limit = limits[app.appId];
-            const evalLimit = evaluateAppLimit(app.usageMinutes, limit);
-            const percentOfDailyTotal = totalUsageMinutes > 0 ? Math.round((app.usageMinutes / totalUsageMinutes) * 100) : 0;
-
-            return (
-              <div
-                key={app.appId}
-                onClick={() => setSelectedAppForDetail(app)}
-                className="bg-slate-900/70 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700/80 rounded-2xl p-3.5 transition-all cursor-pointer flex flex-col space-y-2.5 group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold shadow-inner"
-                      style={{ backgroundColor: `${app.color}25`, color: app.color }}
-                    >
-                      {app.icon}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-200 text-sm flex items-center space-x-1.5">
-                        <span>{app.appName}</span>
-                        <span className="text-[10px] text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded">
-                          {percentOfDailyTotal}%
-                        </span>
-                      </div>
-                      <div className="text-xs text-slate-400">{app.category}</div>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-slate-100">{formatMinutes(app.usageMinutes)}</div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-md inline-block mt-0.5 ${evalLimit.statusBadgeClass}`}>
-                      {evalLimit.statusText}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      evalLimit.status === 'EXCEEDED'
-                        ? 'bg-rose-500'
-                        : evalLimit.status === 'AT_LIMIT'
-                        ? 'bg-amber-400'
-                        : 'bg-indigo-500'
-                    }`}
-                    style={{ width: `${Math.min(percentOfDailyTotal * 2, 100)}%` }}
-                  />
+      {/* Main 2-Column Responsive Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+        {/* Left Column on Desktop (7 cols) */}
+        <div className="md:col-span-7 space-y-5">
+          {/* PRIMARY METRIC HERO CARD (Deep Navy #0F172A) */}
+          <div className="bg-[#0F172A] text-white rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                  Today's Screen Time
+                </span>
+                <div className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-1">
+                  {formatMinutes(totalUsageMinutes)}
                 </div>
               </div>
-            );
-          })}
+
+              {/* Semantic Zone Badge */}
+              <div className="text-right">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-400 text-slate-900 shadow-xs">
+                  {zoneMeta.name}
+                </span>
+                <div className="text-[11px] text-slate-400 mt-1">{zoneMeta.rangeText}</div>
+              </div>
+            </div>
+
+            {/* Daily Target Sub-bar */}
+            <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-1.5 text-slate-300">
+                <span>Daily Target:</span>
+                <span className="font-semibold text-white">{formatMinutes(profile.dailyGoalMinutes)}</span>
+              </div>
+
+              <div
+                className={`px-2.5 py-0.5 rounded-md text-xs font-semibold ${
+                  isOverGoal
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                }`}
+              >
+                {formatMinutes(goalDiffMinutes)} {isOverGoal ? 'over goal' : 'remaining'}
+              </div>
+            </div>
+          </div>
+
+          {/* Weekly Trend Chart */}
+          <WeeklyTrendChart trend={weeklyTrend} goalMinutes={profile.dailyGoalMinutes} />
+
+          {/* Quick Routines (Schedules & Gradual Reduction) */}
+          <div className="grid grid-cols-2 gap-3">
+            <Card
+              onClick={() => setIsReductionModalOpen(true)}
+              className="p-4 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-bold text-slate-900">Gradual Detox</span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Active
+                  </span>
+                </div>
+                <div className="text-xs text-slate-500">YouTube: 120m → 60m</div>
+              </div>
+              <div className="text-[11px] font-medium text-[#2F855A] mt-3 flex items-center space-x-1">
+                <span>View Detox Plan</span>
+                <ChevronRightIcon className="w-3 h-3" />
+              </div>
+            </Card>
+
+            <Card
+              onClick={() => setIsSchedulesModalOpen(true)}
+              className="p-4 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-bold text-slate-900">Scheduled Blocking</span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                    Enabled
+                  </span>
+                </div>
+                <div className="text-xs text-slate-500">Study Hours (09:00–12:00)</div>
+              </div>
+              <div className="text-[11px] font-medium text-slate-800 mt-3 flex items-center space-x-1">
+                <span>Manage Rules</span>
+                <ChevronRightIcon className="w-3 h-3" />
+              </div>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-2 gap-3 pt-2">
-        <button
-          onClick={() => setIsReductionModalOpen(true)}
-          className="p-3.5 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-800 text-left transition-all group"
-        >
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xl">📉</span>
-            <span className="text-[10px] font-semibold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
-              Active
-            </span>
-          </div>
-          <div className="text-xs font-bold text-slate-200">Gradual Reduction</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">YouTube: 120m → 60m</div>
-        </button>
+        {/* Right Column on Desktop (5 cols) */}
+        <div className="md:col-span-5 space-y-5">
+          {/* Key Insight Card (Section 26) */}
+          <Card className="p-5 space-y-3 border-l-4 border-l-[#2F855A]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Fostera Coach
+              </span>
+              <button
+                onClick={() => setIsInsightsModalOpen(true)}
+                className="text-xs text-[#2F855A] hover:underline font-medium"
+              >
+                All Insights →
+              </button>
+            </div>
 
-        <button
-          onClick={() => setIsSchedulesModalOpen(true)}
-          className="p-3.5 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-800 text-left transition-all group"
-        >
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xl">⏰</span>
-            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-              Enabled
-            </span>
-          </div>
-          <div className="text-xs font-bold text-slate-200">Scheduled Blocking</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">Study Hours (09:00–12:00)</div>
-        </button>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">Major Usage Concentration</h2>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                YouTube + Instagram account for <strong>63%</strong> of today's usage (2h 50m).
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center space-x-2">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setActiveTab('FOCUS')}
+                className="flex-1"
+              >
+                Start Focus Mode
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const yt = apps.find(a => a.appId === 'youtube');
+                  if (yt) setSelectedAppForLimit(yt);
+                }}
+              >
+                Set Limit
+              </Button>
+            </div>
+          </Card>
+
+          {/* Top Consuming Apps Section (Section 20 & 29) */}
+          <Card className="p-5 space-y-3">
+            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Top Consuming Apps
+              </h2>
+              <span className="text-[11px] text-slate-400">Click to inspect</span>
+            </div>
+
+            <div className="space-y-2 pt-1">
+              {apps.map(app => {
+                const limit = limits[app.appId];
+                const evalLimit = evaluateAppLimit(app.usageMinutes, limit);
+                const percent = totalUsageMinutes > 0 ? Math.round((app.usageMinutes / totalUsageMinutes) * 100) : 0;
+
+                return (
+                  <div
+                    key={app.appId}
+                    onClick={() => setSelectedAppForDetail(app)}
+                    className="p-2.5 rounded-lg border border-slate-100 hover:border-slate-300 bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer flex flex-col space-y-2 group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-800 shadow-2xs">
+                          {app.appName.slice(0, 1)}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-xs text-slate-900 flex items-center space-x-1.5">
+                            <span>{app.appName}</span>
+                            <span className="text-[10px] font-normal text-slate-400">({percent}%)</span>
+                          </div>
+                          <div className="text-[11px] text-slate-500">{app.category}</div>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-xs font-bold text-slate-900">{formatMinutes(app.usageMinutes)}</div>
+                        <StatusBadge
+                          status={evalLimit.status}
+                          text={evalLimit.statusText}
+                          className="mt-0.5"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Usage bar */}
+                    <div className="w-full bg-slate-200/80 h-1 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          evalLimit.status === 'EXCEEDED' ? 'bg-rose-500' : 'bg-slate-700'
+                        }`}
+                        style={{ width: `${Math.min(percent * 2, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

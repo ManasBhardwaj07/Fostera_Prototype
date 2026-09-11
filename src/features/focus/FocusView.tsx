@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { formatMinutes, formatSeconds } from '../../utils/format';
 import type { FocusPurpose } from '../../types';
+import { Card, Button, PageHeader } from '../../components/common/UI';
 
 export const FocusView = () => {
   const {
@@ -18,7 +19,7 @@ export const FocusView = () => {
 
   const durations = [
     { label: '15 min', minutes: 15 },
-    { label: '25 min', minutes: 25, badge: 'Popular' },
+    { label: '25 min', minutes: 25, badge: 'Standard' },
     { label: '45 min', minutes: 45 },
     { label: '60 min', minutes: 60 },
   ];
@@ -36,32 +37,32 @@ export const FocusView = () => {
     startFocusSession(selectedDuration, selectedApps, purpose);
   };
 
+  // ACTIVE FOCUS EXPERIENCE (Section 21 & 22)
   if (activeFocus && activeFocus.status === 'active') {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 pb-28 pt-6 px-4 max-w-md mx-auto flex flex-col justify-between">
+      <div className="max-w-xl mx-auto space-y-6 pt-2 pb-16 md:pb-6 animate-fade-in">
         <div className="text-center space-y-1">
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold">
-            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
+          <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#2F855A] text-xs font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             <span>FOCUS MODE ACTIVE</span>
-          </div>
-          <h1 className="text-xl font-bold text-white pt-1">{activeFocus.purpose} Session</h1>
+          </span>
+          <h1 className="text-2xl font-bold text-slate-900 pt-1">{activeFocus.purpose} Session</h1>
+          <p className="text-xs text-slate-500">Distractions are restricted until timer expires.</p>
         </div>
 
-        <div className="my-8 flex flex-col items-center justify-center relative">
-          <div className="w-64 h-64 rounded-full border-4 border-slate-800/80 flex items-center justify-center relative bg-gradient-to-b from-indigo-950/20 to-slate-900/60 shadow-2xl">
-            <div className="text-center space-y-1 z-10">
-              <div className="text-5xl font-mono font-extrabold tracking-tight text-white">
-                {formatSeconds(activeFocus.remainingSeconds)}
-              </div>
-              <div className="text-xs text-indigo-300 font-medium">
-                {activeFocus.durationMinutes}m planned session
-              </div>
-            </div>
+        {/* Purpose-built timer card (Deep Navy background for maximum focus) */}
+        <div className="bg-[#0F172A] text-white rounded-3xl p-8 sm:p-12 text-center shadow-lg space-y-4">
+          <div className="text-6xl sm:text-7xl font-mono font-extrabold tracking-tight text-white">
+            {formatSeconds(activeFocus.remainingSeconds)}
+          </div>
+          <div className="text-xs text-slate-400 font-medium">
+            {activeFocus.durationMinutes}-minute planned focus window
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">
+        {/* Restricted Apps List */}
+        <Card className="p-4 space-y-3">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
             Restricted Apps ({activeFocus.selectedAppIds.length})
           </div>
           <div className="flex flex-wrap justify-center gap-2">
@@ -71,77 +72,86 @@ export const FocusView = () => {
               return (
                 <span
                   key={appId}
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-200"
+                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700"
                 >
-                  <span>{app.icon}</span>
                   <span>{app.appName}</span>
-                  <span className="text-rose-400 text-[10px]">⛔</span>
+                  <span className="text-rose-600 font-bold text-[10px]">Restricted</span>
                 </span>
               );
             })}
           </div>
-        </div>
+        </Card>
 
-        <div className="pt-8 space-y-2.5">
-          <button
+        {/* Session Controls */}
+        <div className="space-y-2 pt-2">
+          <Button
+            variant="primary"
+            size="lg"
             onClick={completeFocusSession}
-            className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2"
+            className="w-full"
           >
-            <span>Complete Session (Fast-Forward)</span>
-            <span>✓</span>
-          </button>
+            Complete Session (Fast-Forward)
+          </Button>
 
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
             onClick={endFocusSession}
-            className="w-full py-2.5 text-center text-xs text-slate-500 hover:text-rose-400 transition-colors"
+            className="w-full text-slate-500 hover:text-rose-600"
           >
             Cancel Session
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
+  // IDLE SETUP VIEW
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-28 pt-4 px-4 max-w-md mx-auto space-y-6">
-      <header className="pt-2">
-        <span className="text-xs font-medium text-slate-400 tracking-wide uppercase">Intervention Tool</span>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Focus Mode</h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Lock out your highest friction apps to protect deep work or study time.
-        </p>
-      </header>
+    <div className="max-w-2xl mx-auto space-y-6 pb-16 md:pb-6">
+      <PageHeader
+        title="Focus Mode"
+        subtitle="Temporarily restrict distracting applications to protect deep work or study routines."
+      />
 
-      <div className="space-y-2.5">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Duration</span>
-        <div className="grid grid-cols-2 gap-2.5">
+      {/* Duration Selection */}
+      <Card className="p-5 space-y-3">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Duration</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {durations.map(d => {
             const isSelected = selectedDuration === d.minutes;
             return (
               <button
                 key={d.minutes}
                 onClick={() => setSelectedDuration(d.minutes)}
-                className={`p-3 rounded-2xl border text-left transition-all relative ${
+                className={`p-3 rounded-xl border text-left transition-all relative ${
                   isSelected
-                    ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-lg shadow-indigo-600/10'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-slate-700'
+                    ? 'bg-slate-900 border-slate-900 text-white shadow-xs'
+                    : 'bg-white border-slate-200 text-slate-800 hover:border-slate-300'
                 }`}
               >
                 {d.badge && (
-                  <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-indigo-500 text-[9px] font-bold text-white uppercase">
+                  <span
+                    className={`absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${
+                      isSelected ? 'bg-emerald-500 text-slate-900' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
                     {d.badge}
                   </span>
                 )}
                 <div className="text-base font-bold">{d.label}</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Distraction-free</div>
+                <div className={`text-[11px] ${isSelected ? 'text-slate-300' : 'text-slate-400'}`}>
+                  Deep focus
+                </div>
               </button>
             );
           })}
         </div>
-      </div>
+      </Card>
 
-      <div className="space-y-2.5">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Session Purpose</span>
+      {/* Purpose */}
+      <Card className="p-5 space-y-3">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Session Purpose</h2>
         <div className="grid grid-cols-3 gap-2">
           {purposes.map(p => {
             const isSelected = purpose === p;
@@ -149,10 +159,10 @@ export const FocusView = () => {
               <button
                 key={p}
                 onClick={() => setPurpose(p)}
-                className={`py-2.5 px-2 rounded-xl text-center text-xs font-semibold border transition-all ${
+                className={`py-2.5 px-3 rounded-xl text-center text-xs font-semibold border transition-all ${
                   isSelected
-                    ? 'bg-indigo-600 border-indigo-500 text-white'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:bg-slate-800'
+                    ? 'bg-slate-900 border-slate-900 text-white'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                 }`}
               >
                 {p}
@@ -160,12 +170,13 @@ export const FocusView = () => {
             );
           })}
         </div>
-      </div>
+      </Card>
 
-      <div className="space-y-2.5">
+      {/* Apps to Restrict */}
+      <Card className="p-5 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Restricted Apps</span>
-          <span className="text-xs text-indigo-400">{selectedApps.length} selected</span>
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Apps to Restrict</h2>
+          <span className="text-xs font-semibold text-[#2F855A]">{selectedApps.length} selected</span>
         </div>
 
         <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
@@ -175,27 +186,24 @@ export const FocusView = () => {
               <button
                 key={app.appId}
                 onClick={() => toggleApp(app.appId)}
-                className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between ${
+                className={`w-full p-2.5 rounded-xl border text-left transition-all flex items-center justify-between ${
                   isChecked
-                    ? 'bg-indigo-600/15 border-indigo-500/50'
-                    : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
+                    ? 'bg-emerald-50/70 border-emerald-300 text-slate-900'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base"
-                    style={{ backgroundColor: `${app.color}25`, color: app.color }}
-                  >
-                    {app.icon}
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-700">
+                    {app.appName.slice(0, 1)}
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-200 text-sm">{app.appName}</div>
+                    <div className="font-semibold text-xs text-slate-900">{app.appName}</div>
                     <div className="text-[11px] text-slate-400">{formatMinutes(app.usageMinutes)} today</div>
                   </div>
                 </div>
                 <div
-                  className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs ${
-                    isChecked ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-slate-700'
+                  className={`w-4 h-4 rounded-md border flex items-center justify-center text-[10px] ${
+                    isChecked ? 'bg-[#2F855A] border-[#2F855A] text-white' : 'border-slate-300'
                   }`}
                 >
                   {isChecked && '✓'}
@@ -204,18 +212,18 @@ export const FocusView = () => {
             );
           })}
         </div>
-      </div>
+      </Card>
 
-      <div className="pt-2">
-        <button
-          onClick={handleStart}
-          disabled={selectedApps.length === 0}
-          className="w-full py-4 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/25 transition-all active:scale-[0.99] flex items-center justify-center space-x-2"
-        >
-          <span>Start {selectedDuration}-Minute Focus</span>
-          <span>→</span>
-        </button>
-      </div>
+      {/* Start Button */}
+      <Button
+        variant="primary"
+        size="lg"
+        onClick={handleStart}
+        disabled={selectedApps.length === 0}
+        className="w-full"
+      >
+        Start {selectedDuration}-Minute Focus Session
+      </Button>
     </div>
   );
 };
