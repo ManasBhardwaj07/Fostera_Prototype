@@ -3,6 +3,7 @@ import { formatMinutes } from '../../utils/format';
 import { getZoneMeta } from '../../domain/usage/zoneCalculator';
 import { evaluateAppLimit } from '../../domain/limits/limitEvaluator';
 import { Card, Button } from '../../components/common/UI';
+import { X, ArrowRight, Brain, AlertCircle } from 'lucide-react';
 
 export const Dashboard = () => {
   const {
@@ -17,7 +18,6 @@ export const Dashboard = () => {
     setActiveTab,
     setSelectedAppForDetail,
     
-    setIsInsightsModalOpen,
     nudges,
     dismissNudge,
   } = useApp();
@@ -26,40 +26,50 @@ export const Dashboard = () => {
   const sortedApps = [...apps].sort((a, b) => b.usageMinutes - a.usageMinutes);
   const topApps = sortedApps.slice(0, 3);
 
+  // Time based greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
   return (
-    <div className="space-y-6 pb-16 animate-fade-in px-1">
+    <div className="space-y-8 pb-16 animate-fade-in">
       
-      {/* 1. Hero: Total Time & Zone */}
+      {/* 1. Hero: Greeting, Total Time & Zone */}
       <div className="pt-2">
-        <h1 className="text-sm font-semibold text-fostera-text-secondary mb-1">
-          Today
+        <h1 className="text-sm font-medium text-fostera-text-secondary mb-2">
+          {greeting}, {profile.userName}
         </h1>
-        <div className="flex items-end justify-between">
-          <div className="text-[3.5rem] leading-none font-extrabold tracking-tight text-fostera-text-primary">
+        
+        <div className="mb-2">
+          <div className="text-[4rem] leading-none font-bold tracking-tighter text-fostera-text-primary mb-1">
             {formatMinutes(totalUsageMinutes)}
           </div>
+          <div className="text-sm text-fostera-text-secondary font-medium">
+            screen time today
+          </div>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
-              {zoneMeta.name}
-            </span>
+
+        <div className="mt-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className={`w-2.5 h-2.5 rounded-full ${currentZone === 'GREEN' ? 'bg-emerald-500' : currentZone === 'BLUE' ? 'bg-blue-500' : currentZone === 'YELLOW' ? 'bg-yellow-500' : currentZone === 'ORANGE' ? 'bg-orange-500' : 'bg-red-500'}`}></span>
+            <span className="text-sm font-semibold text-fostera-text-primary">{zoneMeta.name}</span>
           </div>
           <div className="text-right">
-            <div className={`text-sm font-semibold ${isOverGoal ? 'text-rose-600' : 'text-fostera-text-secondary'}`}>
+            <div className={`text-sm font-semibold ${isOverGoal ? 'text-rose-600 dark:text-rose-400' : 'text-fostera-text-secondary'}`}>
               {formatMinutes(goalDiffMinutes)} {isOverGoal ? 'over target' : 'remaining'}
             </div>
-            <div className="text-[11px] text-slate-400">Target: {formatMinutes(profile.dailyGoalMinutes)}</div>
+            <div className="text-[11px] text-fostera-text-secondary opacity-70">
+              Target: {formatMinutes(profile.dailyGoalMinutes)}
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Target Progress Bar */}
-      <div className="w-full bg-black/5 h-2 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${isOverGoal ? 'bg-amber-400' : 'bg-fostera-brand'}`}
-          style={{ width: `${Math.min((totalUsageMinutes / profile.dailyGoalMinutes) * 100, 100)}%` }}
-        />
+        
+        {/* Target Progress Bar */}
+        <div className="w-full bg-fostera-surface-soft h-1.5 rounded-full overflow-hidden mt-3">
+          <div
+            className={`h-full rounded-full transition-all duration-700 ${isOverGoal ? 'bg-rose-500' : 'bg-fostera-brand'}`}
+            style={{ width: `${Math.min((totalUsageMinutes / profile.dailyGoalMinutes) * 100, 100)}%` }}
+          />
+        </div>
       </div>
 
       {/* Active Focus Banner */}
@@ -85,22 +95,25 @@ export const Dashboard = () => {
       {nudges.length > 0 && (
         <div className="space-y-3">
           {nudges.slice(0, 1).map(nudge => (
-            <Card key={nudge.id} className="!p-4 !bg-fostera-surface-soft !border-0">
-              <div className="flex justify-between items-start">
-                <div className="text-sm font-semibold text-fostera-text-primary">{nudge.message}</div>
-                <button onClick={() => dismissNudge(nudge.id)} className="text-fostera-text-secondary ml-2">✕</button>
+            <Card key={nudge.id} className="!p-4 !bg-fostera-surface-soft !border-0 flex justify-between items-start">
+              <div className="flex gap-3">
+                <AlertCircle className="w-5 h-5 text-fostera-brand shrink-0 mt-0.5" />
+                <div className="text-sm font-medium text-fostera-text-primary leading-snug">{nudge.message}</div>
               </div>
+              <button onClick={() => dismissNudge(nudge.id)} className="text-fostera-text-secondary hover:text-fostera-text-primary ml-2 shrink-0 p-1">
+                <X size={16} />
+              </button>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Top Consuming Apps (Not in a card, directly on surface for breathability) */}
-      <div className="pt-2 space-y-3">
+      {/* Top Consuming Apps */}
+      <div className="space-y-3">
         <h2 className="text-[13px] font-bold text-fostera-text-secondary uppercase tracking-wider pl-1">
-          Top Distractions
+          Biggest Distractions
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-1">
           {topApps.map(app => {
             const limit = limits[app.appId];
             const evalLimit = evaluateAppLimit(app.usageMinutes, limit);
@@ -109,7 +122,7 @@ export const Dashboard = () => {
               <div
                 key={app.appId}
                 onClick={() => setSelectedAppForDetail(app)}
-                className="p-3.5 rounded-[20px] bg-white border border-black/5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
+                className="p-3.5 rounded-[20px] bg-transparent hover:bg-fostera-surface-soft flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all"
               >
                 <div className="flex items-center space-x-3.5">
                   <div className="w-10 h-10 rounded-2xl bg-fostera-surface-soft flex items-center justify-center font-bold text-sm text-fostera-text-primary">
@@ -124,10 +137,10 @@ export const Dashboard = () => {
                     )}
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex flex-col items-end justify-center">
                   <div className="font-bold text-[15px] text-fostera-text-primary">{formatMinutes(app.usageMinutes)}</div>
                   {evalLimit.status === 'EXCEEDED' && (
-                    <div className="text-[10px] font-bold text-rose-600 uppercase tracking-wider mt-0.5">Exceeded</div>
+                    <div className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mt-0.5">Exceeded</div>
                   )}
                 </div>
               </div>
@@ -137,21 +150,23 @@ export const Dashboard = () => {
       </div>
 
       {/* Coach Insight */}
-      <Card className="!p-5 space-y-4 !bg-[#E4F0E9] !border-0">
-        <div className="flex justify-between items-center">
-          <span className="text-[11px] font-bold text-fostera-brand-dark uppercase tracking-wider">
-            Coach Insight
-          </span>
-          <button onClick={() => setIsInsightsModalOpen(true)} className="text-xs text-fostera-brand-dark font-medium underline">
-            All Insights
-          </button>
+      <Card className="!p-6 space-y-4 !bg-fostera-brand-soft !border-0 relative overflow-hidden">
+        <div className="absolute -right-4 -top-4 opacity-10">
+          <Brain size={120} />
         </div>
-        <div className="text-[15px] text-fostera-brand-dark leading-relaxed">
-          YouTube and Instagram account for nearly <strong>63%</strong> of your screen time today.
+        <div className="relative z-10">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-[11px] font-bold text-fostera-brand-dark uppercase tracking-wider">
+              A small observation
+            </span>
+          </div>
+          <div className="text-[15px] text-fostera-brand-dark leading-relaxed font-medium mb-5">
+            YouTube and Instagram account for nearly <strong>63%</strong> of your screen time today.
+          </div>
+          <Button variant="primary" size="md" onClick={() => setActiveTab('FOCUS')} className="w-full !bg-fostera-brand-dark hover:!bg-fostera-focal">
+            Start Focus Session <ArrowRight size={16} className="ml-1" />
+          </Button>
         </div>
-        <Button variant="primary" size="md" onClick={() => setActiveTab('FOCUS')} className="w-full !bg-fostera-brand-dark">
-          Start Focus Session
-        </Button>
       </Card>
       
     </div>

@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
-import { CloseIcon } from './Icons';
+import { X } from 'lucide-react';
 
-// Standard Card
 export const Card = ({
   children,
   className = '',
@@ -14,7 +13,7 @@ export const Card = ({
   return (
     <div
       onClick={onClick}
-      className={`bg-fostera-surface rounded-[24px] p-5 shadow-sm border border-black/[0.03] ${
+      className={`bg-fostera-surface rounded-[24px] p-5 shadow-soft border border-fostera-border ${
         onClick ? 'cursor-pointer active:scale-[0.98] transition-transform' : ''
       } ${className}`}
     >
@@ -23,7 +22,6 @@ export const Card = ({
   );
 };
 
-// Standard Button
 export const Button = ({
   children,
   variant = 'primary',
@@ -41,7 +39,7 @@ export const Button = ({
   className?: string;
   type?: 'button' | 'submit' | 'reset';
 }) => {
-  const base = 'inline-flex items-center justify-center font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
+  const base = 'inline-flex items-center justify-center font-medium transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
   
   const sizeStyles = {
     sm: 'text-xs px-4 py-2 rounded-xl gap-1.5',
@@ -50,11 +48,11 @@ export const Button = ({
   };
 
   const variantStyles = {
-    primary: 'bg-fostera-brand text-white focus:ring-fostera-brand/30 hover:bg-fostera-brand-dark',
-    focal: 'bg-fostera-focal text-white focus:ring-fostera-focal/30 hover:bg-[#0f1713]',
-    secondary: 'bg-white text-fostera-text-primary border border-black/10 focus:ring-black/10 hover:bg-black/5',
-    danger: 'bg-rose-50 text-rose-700 border border-rose-100 focus:ring-rose-200 hover:bg-rose-100',
-    subtle: 'text-fostera-text-secondary hover:text-fostera-text-primary hover:bg-black/5 focus:ring-black/10',
+    primary: 'bg-fostera-brand text-white hover:bg-fostera-brand-dark',
+    focal: 'bg-fostera-focal text-white hover:bg-black',
+    secondary: 'bg-fostera-surface text-fostera-text-primary border border-fostera-border hover:bg-fostera-surface-soft',
+    danger: 'bg-rose-500/10 text-rose-600 border border-rose-500/20 hover:bg-rose-500/20',
+    subtle: 'text-fostera-text-secondary hover:text-fostera-text-primary hover:bg-fostera-surface-soft',
   };
 
   return (
@@ -69,7 +67,6 @@ export const Button = ({
   );
 };
 
-// Status Badge
 export const StatusBadge = ({
   status,
   text,
@@ -80,20 +77,19 @@ export const StatusBadge = ({
   className?: string;
 }) => {
   const styles = {
-    UNDER: 'bg-fostera-brand-soft text-fostera-brand-dark font-medium',
-    AT_LIMIT: 'bg-amber-100 text-amber-800 font-medium',
-    EXCEEDED: 'bg-rose-100 text-rose-700 font-semibold',
-    NO_LIMIT: 'bg-black/5 text-fostera-text-secondary font-normal',
+    UNDER: 'bg-fostera-brand-soft text-fostera-brand-dark',
+    AT_LIMIT: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
+    EXCEEDED: 'bg-rose-500/15 text-rose-700 dark:text-rose-400',
+    NO_LIMIT: 'bg-fostera-surface-soft text-fostera-text-secondary',
   };
 
   return (
-    <span className={`inline-flex items-center text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md ${styles[status]} ${className}`}>
+    <span className={`inline-flex items-center text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-md ${styles[status]} ${className}`}>
       {text}
     </span>
   );
 };
 
-// Page Header
 export const PageHeader = ({
   title,
   subtitle,
@@ -104,17 +100,16 @@ export const PageHeader = ({
   action?: ReactNode;
 }) => {
   return (
-    <div className="flex items-start justify-between pb-2 mb-4 px-2">
+    <div className="flex items-start justify-between pb-2 mb-4 px-2 pt-2">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-fostera-text-primary">{title}</h1>
-        {subtitle && <p className="text-[13px] text-fostera-text-secondary mt-1">{subtitle}</p>}
+        <h1 className="text-[28px] leading-tight font-bold tracking-tight text-fostera-text-primary">{title}</h1>
+        {subtitle && <p className="text-[14px] text-fostera-text-secondary mt-1">{subtitle}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>
   );
 };
 
-// Shared Modal Container (Supports Center Dialog & Bottom Sheet)
 export const Modal = ({
   isOpen,
   onClose,
@@ -133,7 +128,7 @@ export const Modal = ({
   if (!isOpen) return null;
 
   const positionClasses = position === 'bottom'
-    ? "items-end sm:items-center" // Bottom sheet on mobile, center on desktop (if responsive classes kept)
+    ? "items-end sm:items-center"
     : "items-center";
 
   const containerClasses = position === 'bottom'
@@ -141,7 +136,7 @@ export const Modal = ({
     : "w-[90%] max-w-[400px] rounded-[32px] max-h-[85vh]";
 
   return (
-    <div className={`fixed inset-0 z-50 flex justify-center p-0 sm:p-4 bg-fostera-focal/40 backdrop-blur-sm animate-fade-in ${positionClasses}`}>
+    <div className={`fixed inset-0 z-50 flex justify-center p-0 sm:p-4 bg-black/40 dark:bg-black/60 backdrop-blur-sm animate-fade-in ${positionClasses}`}>
       <div
         className={`bg-fostera-surface shadow-2xl overflow-hidden flex flex-col ${containerClasses}`}
         onClick={(e) => e.stopPropagation()}
@@ -154,9 +149,9 @@ export const Modal = ({
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-black/5 text-fostera-text-secondary hover:text-fostera-text-primary hover:bg-black/10 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full bg-fostera-surface-soft text-fostera-text-secondary hover:text-fostera-text-primary flex items-center justify-center transition-colors"
             >
-              <CloseIcon className="w-4 h-4" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}

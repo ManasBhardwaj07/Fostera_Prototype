@@ -3,8 +3,44 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    /* Using a neutral dark/blurred desktop background so the phone frame stands out */
-    @apply bg-slate-200 text-fostera-text-primary antialiased;
+  :root {
+    --color-bg: #F6F7F5;
+    --color-surface: #FFFFFF;
+    --color-surface-soft: #EEF1ED;
+    --color-text-primary: #17201B;
+    --color-text-secondary: #66736B;
+    --color-brand: #2F7D59;
+    --color-brand-dark: #216044;
+    --color-brand-soft: #E4F0E9;
+    --color-focal: #17221C;
+    --color-border: rgba(0, 0, 0, 0.06);
   }
+
+  .dark {
+    --color-bg: #121413;
+    --color-surface: #1B1E1C;
+    --color-surface-soft: #232724;
+    --color-text-primary: #F6F7F5;
+    --color-text-secondary: #9CA3AF;
+    --color-brand: #3BA97A;
+    --color-brand-dark: #2F7D59;
+    --color-brand-soft: #1E3328;
+    --color-focal: #1B1E1C;
+    --color-border: rgba(255, 255, 255, 0.06);
+  }
+
+  body {
+    @apply bg-fostera-bg text-fostera-text-primary antialiased;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

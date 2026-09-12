@@ -28,24 +28,24 @@ export const AppDetailModal = () => {
     >
       <div className="space-y-6">
         
-        {/* Header directly in body since title is omitted from Modal wrapper to use custom layout */}
+        {/* Header */}
         <div className="text-center space-y-1">
-          <div className="w-16 h-16 rounded-3xl bg-fostera-surface-soft border border-black/5 mx-auto flex items-center justify-center text-2xl font-bold text-fostera-text-primary mb-3">
+          <div className="w-16 h-16 rounded-[24px] bg-fostera-surface-soft flex items-center justify-center text-2xl font-bold text-fostera-text-primary mx-auto mb-4">
              {app.appName.slice(0,1)}
           </div>
-          <h2 className="text-2xl font-bold text-fostera-text-primary">{app.appName}</h2>
-          <p className="text-sm text-fostera-text-secondary">{app.category}</p>
+          <h2 className="text-2xl font-bold text-fostera-text-primary tracking-tight">{app.appName}</h2>
+          <p className="text-[13px] font-medium text-fostera-text-secondary">{app.category}</p>
         </div>
 
         {/* Stats */}
-        <div className="bg-fostera-warm rounded-[20px] p-4 flex justify-between items-center">
+        <div className="bg-fostera-surface-soft rounded-[24px] p-5 flex justify-between items-center">
            <div>
-             <div className="text-[11px] uppercase tracking-wider font-bold text-fostera-text-secondary mb-1">Today's Usage</div>
+             <div className="text-[10px] uppercase tracking-wider font-bold text-fostera-text-secondary mb-1">Today's Usage</div>
              <div className="text-xl font-bold text-fostera-text-primary">{formatMinutes(app.usageMinutes)}</div>
-             <div className="text-xs text-fostera-text-secondary mt-0.5">{share}% of total</div>
+             <div className="text-[11px] font-medium text-fostera-text-secondary mt-0.5">{share}% of total</div>
            </div>
-           <div className="text-right">
-             <div className="text-[11px] uppercase tracking-wider font-bold text-fostera-text-secondary mb-1">Daily Limit</div>
+           <div className="text-right flex flex-col items-end">
+             <div className="text-[10px] uppercase tracking-wider font-bold text-fostera-text-secondary mb-1">Daily Limit</div>
              <div className="text-xl font-bold text-fostera-text-primary">{limit?.enabled ? formatMinutes(limit.limitMinutes) : 'None'}</div>
              <StatusBadge status={evalLimit.status} text={evalLimit.statusText} className="mt-0.5" />
            </div>
@@ -63,7 +63,7 @@ export const AppDetailModal = () => {
           </Button>
 
           <Button
-            variant="primary"
+            variant="focal"
             size="lg"
             onClick={() => { setSelectedAppForDetail(null); setActiveTab('FOCUS'); }}
             className="w-full"
