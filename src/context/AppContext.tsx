@@ -27,6 +27,8 @@ import {
 } from '../services/persistence/storageService';
 import { usageDataProvider } from '../services/usage/UsageDataProvider';
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 interface AppContextType {
   activeTab: NavigationTab;
   setActiveTab: (tab: NavigationTab) => void;
@@ -68,6 +70,10 @@ interface AppContextType {
   setIsReductionModalOpen: (open: boolean) => void;
   isInsightsModalOpen: boolean;
   setIsInsightsModalOpen: (open: boolean) => void;
+  themeMode: ThemeMode;
+  setThemeMode: (mode: ThemeMode) => void;
+  isSettingsModalOpen: boolean;
+  setIsSettingsModalOpen: (open: boolean) => void;
   isDevModalOpen: boolean;
   setIsDevModalOpen: (open: boolean) => void;
   resetAllDemoData: () => void;
@@ -78,6 +84,40 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('TODAY');
   const [profile, setProfile] = useState<UserProfile>(() => storageService.getUserProfile());
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem('fostera_theme_mode') as ThemeMode;
+    if (saved === 'light' || saved === 'dark' || saved === 'system') return saved;
+    return 'system';
+  });
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  const setThemeMode = useCallback((mode: ThemeMode) => {
+    setThemeModeState(mode);
+    localStorage.setItem('fostera_theme_mode', mode);
+  }, []);
+
+  useEffect(() => {
+    const applyTheme = () => {
+      const isDark =
+        themeMode === 'dark' ||
+        (themeMode === 'system' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    applyTheme();
+
+    if (themeMode === 'system' && typeof window !== 'undefined' && window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => applyTheme();
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [themeMode]);
   const [apps, setApps] = useState<AppUsage[]>([]);
   const [weeklyTrend, setWeeklyTrend] = useState<DailyProgress[]>([]);
   const [limits, setLimits] = useState<Record<string, AppLimit>>(() => storageService.getAppLimits());
@@ -374,6 +414,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setIsReductionModalOpen,
         isInsightsModalOpen,
         setIsInsightsModalOpen,
+        themeMode,
+        setThemeMode,
+        isSettingsModalOpen,
+        setIsSettingsModalOpen,
         isDevModalOpen,
         setIsDevModalOpen,
         resetAllDemoData,

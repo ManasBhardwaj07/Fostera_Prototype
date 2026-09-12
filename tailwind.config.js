@@ -10,8 +10,10 @@ export default {
       colors: {
         fostera: {
           bg: 'var(--color-bg)',
+          backdrop: 'var(--color-backdrop)',
           surface: 'var(--color-surface)',
           'surface-soft': 'var(--color-surface-soft)',
+          'surface-hover': 'var(--color-surface-hover)',
           'text-primary': 'var(--color-text-primary)',
           'text-secondary': 'var(--color-text-secondary)',
           brand: 'var(--color-brand)',
@@ -19,13 +21,15 @@ export default {
           'brand-soft': 'var(--color-brand-soft)',
           focal: 'var(--color-focal)',
           border: 'var(--color-border)',
+          'border-subtle': 'var(--color-border-subtle)',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       boxShadow: {
-        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+        'soft': 'var(--shadow-soft)',
+        'elevated': 'var(--shadow-elevated)',
       }
     },
   },

@@ -7,84 +7,142 @@ export const ProgressView = () => {
   const { reward } = useApp();
 
   return (
-    <div className="space-y-8 pb-16 animate-fade-in">
+    <div className="space-y-6 pb-20">
       <PageHeader
         title="Your week"
+        subtitle="Reflecting on consistency and focus"
       />
 
-      <div className="px-2 space-y-10">
-        
-        {/* Reflection Header */}
-        <div className="pt-2">
-          <div className="inline-flex items-center space-x-2 bg-orange-500/10 text-orange-600 px-4 py-2 rounded-full font-bold text-sm mb-4">
-            <Flame size={18} strokeWidth={2.5} />
+      <div className="space-y-6">
+        {/* 1. Streak Reflection Hero */}
+        <div className="pt-1">
+          <div className="inline-flex items-center space-x-2 bg-amber-500/10 text-amber-700 dark:text-amber-300 px-3.5 py-1.5 rounded-full font-bold text-xs mb-3 border border-amber-500/20">
+            <Flame size={15} strokeWidth={2.5} />
             <span>{reward.streakDays} day streak</span>
           </div>
-          <h2 className="text-[28px] leading-tight font-bold text-fostera-text-primary tracking-tight pr-4">
-            You're building a better habit.
+          <h2 className="text-[24px] sm:text-[26px] leading-tight font-bold text-fostera-text-primary tracking-tight">
+            You're building a steady habit.
           </h2>
+          <p className="text-xs sm:text-sm text-fostera-text-secondary mt-1 font-medium">
+            Small daily boundaries create lasting change over time.
+          </p>
         </div>
 
-        {/* Weekly Stats */}
-        <Card className="!p-6 space-y-6">
+        {/* 2. Target Adherence Card */}
+        <Card className="!p-5 space-y-5">
           <div>
-            <h3 className="text-sm font-bold text-fostera-text-secondary uppercase tracking-wider mb-4">Target adherence</h3>
-            <div className="flex justify-between items-center mb-2">
-               {[1,2,3,4,5,6,7].map((_, i) => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <span className="text-[10px] font-medium text-fostera-text-secondary">
-                      {['M','T','W','T','F','S','S'][i]}
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-bold text-fostera-text-secondary uppercase tracking-wider">
+                Target adherence
+              </h3>
+              <span className="text-[11px] font-semibold text-fostera-brand">
+                4 of 5 days within target
+              </span>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
+                const isMet = i < 4;
+                const isFuture = i >= 5;
+
+                return (
+                  <div key={i} className="flex flex-col items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-fostera-text-secondary">
+                      {day}
                     </span>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      i < 4 ? 'bg-fostera-brand text-white' : 'bg-fostera-surface-soft text-transparent'
-                    }`}>
-                      <CheckCircle2 size={16} strokeWidth={3} />
+                    <div
+                      className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
+                        isMet
+                          ? 'bg-fostera-brand text-white shadow-xs'
+                          : isFuture
+                          ? 'bg-fostera-surface-soft text-fostera-text-secondary/40 border border-fostera-border/50'
+                          : 'bg-fostera-surface-soft text-fostera-text-secondary border border-fostera-border'
+                      }`}
+                    >
+                      {isMet ? (
+                        <CheckCircle2 size={16} strokeWidth={2.5} />
+                      ) : (
+                        <span className="text-xs font-bold">&ndash;</span>
+                      )}
                     </div>
                   </div>
-               ))}
+                );
+              })}
             </div>
-            <p className="text-[14px] text-fostera-text-primary mt-4 font-semibold text-center">4 of 5 days within target</p>
           </div>
-          
-          <div className="border-t border-fostera-border pt-5">
-            <div className="flex justify-between items-end">
+
+          <div className="border-t border-fostera-border pt-4">
+            <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-xs font-bold text-fostera-text-secondary uppercase tracking-wider mb-1">Today's Focus</h3>
-                <p className="text-lg font-bold text-fostera-text-primary">{formatMinutes(reward.todayFocusMinutes)} focused</p>
+                <h3 className="text-xs font-bold text-fostera-text-secondary uppercase tracking-wider mb-0.5">
+                  Today's Deep Focus
+                </h3>
+                <p className="text-lg font-bold text-fostera-text-primary tracking-tight">
+                  {formatMinutes(reward.todayFocusMinutes)} completed
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                  +{reward.weeklyImprovementPercent}% this week
+                </span>
               </div>
             </div>
           </div>
         </Card>
 
-        {/* Achievements */}
-        <div className="pt-2">
-           <h3 className="text-[13px] font-bold text-fostera-text-secondary uppercase tracking-wider mb-4 pl-1">Milestones</h3>
-           <div className="space-y-3">
-             {reward.badges.map((badge, idx) => {
-               // Assigning icons based on index for the mock
-               const Icon = idx === 0 ? Trophy : Lock;
-               
-               return (
-                 <div key={badge.id} className={`p-4 rounded-[24px] flex items-center space-x-4 transition-all border ${
-                   badge.unlocked 
-                    ? 'bg-fostera-surface border-fostera-border shadow-sm' 
-                    : 'bg-transparent border-transparent opacity-50'
-                 }`}>
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-                      badge.unlocked ? 'bg-fostera-brand-soft text-fostera-brand-dark' : 'bg-fostera-surface-soft text-fostera-text-secondary'
-                    }`}>
-                      <Icon size={24} />
-                    </div>
-                    <div>
-                      <div className="font-bold text-[15px] text-fostera-text-primary">{badge.title}</div>
-                      <div className="text-[13px] text-fostera-text-secondary mt-0.5 leading-snug pr-2">{badge.description}</div>
-                    </div>
-                 </div>
-               )
-             })}
-           </div>
-        </div>
+        {/* 3. Milestones */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between pl-1">
+            <h3 className="text-xs font-bold text-fostera-text-secondary uppercase tracking-wider">
+              Milestones
+            </h3>
+            <span className="text-[11px] text-fostera-text-secondary font-medium">
+              {reward.badges.filter(b => b.unlocked).length} of {reward.badges.length} unlocked
+            </span>
+          </div>
 
+          <div className="space-y-2">
+            {reward.badges.map((badge, idx) => {
+              const Icon = idx === 0 ? Trophy : Lock;
+
+              return (
+                <div
+                  key={badge.id}
+                  className={`p-3.5 rounded-2xl flex items-center space-x-3.5 transition-all border ${
+                    badge.unlocked
+                      ? 'bg-fostera-surface border-fostera-border/80 shadow-soft'
+                      : 'bg-fostera-surface-soft/40 border-fostera-border/40 opacity-60'
+                  }`}
+                >
+                  <div
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                      badge.unlocked
+                        ? 'bg-fostera-brand-soft text-fostera-brand-dark'
+                        : 'bg-fostera-surface-soft text-fostera-text-secondary'
+                    }`}
+                  >
+                    <Icon size={20} strokeWidth={2} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm text-fostera-text-primary truncate">
+                      {badge.title}
+                    </div>
+                    <div className="text-xs text-fostera-text-secondary mt-0.5 leading-snug">
+                      {badge.description}
+                    </div>
+                  </div>
+                  {badge.unlocked && (
+                    <div className="shrink-0">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-fostera-brand bg-fostera-brand-soft px-2 py-0.5 rounded-md">
+                        Achieved
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

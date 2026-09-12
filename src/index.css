@@ -4,43 +4,93 @@
 
 @layer base {
   :root {
+    --color-backdrop: #E9ECE6;
     --color-bg: #F6F7F5;
     --color-surface: #FFFFFF;
     --color-surface-soft: #EEF1ED;
+    --color-surface-hover: #E5EAE3;
     --color-text-primary: #17201B;
     --color-text-secondary: #66736B;
     --color-brand: #2F7D59;
     --color-brand-dark: #216044;
     --color-brand-soft: #E4F0E9;
     --color-focal: #17221C;
-    --color-border: rgba(0, 0, 0, 0.06);
+    --color-border: rgba(23, 32, 27, 0.08);
+    --color-border-subtle: rgba(23, 32, 27, 0.04);
+    --shadow-soft: 0 2px 10px -2px rgba(23, 32, 27, 0.04), 0 1px 3px rgba(23, 32, 27, 0.02);
+    --shadow-elevated: 0 12px 32px -6px rgba(23, 32, 27, 0.08), 0 4px 12px -2px rgba(23, 32, 27, 0.04);
   }
 
   .dark {
+    --color-backdrop: #0B0D0C;
     --color-bg: #121413;
     --color-surface: #1B1E1C;
     --color-surface-soft: #232724;
-    --color-text-primary: #F6F7F5;
-    --color-text-secondary: #9CA3AF;
+    --color-surface-hover: #2B302C;
+    --color-text-primary: #F3F5F3;
+    --color-text-secondary: #97A29B;
     --color-brand: #3BA97A;
     --color-brand-dark: #2F7D59;
     --color-brand-soft: #1E3328;
-    --color-focal: #1B1E1C;
-    --color-border: rgba(255, 255, 255, 0.06);
+    --color-focal: #181B19;
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-subtle: rgba(255, 255, 255, 0.04);
+    --shadow-soft: 0 4px 16px -2px rgba(0, 0, 0, 0.25);
+    --shadow-elevated: 0 16px 40px -8px rgba(0, 0, 0, 0.45);
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    @apply bg-fostera-bg text-fostera-text-primary antialiased;
+    background-color: var(--color-backdrop);
+    color: var(--color-text-primary);
   }
 }
 
 @layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out forwards;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .view-enter {
+    animation: viewEnter 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .sheet-enter {
+    animation: sheetEnter 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes viewEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheetEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
